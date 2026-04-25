@@ -5,3 +5,19 @@ dist
 
 # Ignore the output video from Git but not videos you import into src/.
 out
+
+# Python venv & cache
+koji-youtube-env/
+__pycache__/
+*.pyc
+
+# Build artifacts & runtime output
+build/
+public/script/
+script_maker/out/
+
+# Logs
+*.log
+
+# Claude worktrees / state
+.claude/

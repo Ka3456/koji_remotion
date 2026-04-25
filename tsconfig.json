@@ -5,11 +5,11 @@
     "jsx": "react-jsx",
     "strict": true,
     "noEmit": true,
-    "lib": ["es2015"],
+    "lib": ["es2020", "dom"],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": false
   },
   "exclude": ["remotion.config.ts"]
 }

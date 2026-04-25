@@ -1,0 +1,55 @@
+{
+  "slides": [
+    {
+      "slideNumber": 1,
+      "format": "format01",
+      "title": "お金の増やし方\n完全ガイド",
+      "subtitle": "知らないと損する",
+      "seconds": 7
+    },
+    {
+      "slideNumber": 2,
+      "format": "format04",
+      "title": "今日のテーマ",
+      "items": [
+        "収入を増やす方法",
+        "支出を減らす方法",
+        "資産を運用する方法"
+      ],
+      "seconds": 7
+    },
+    {
+      "slideNumber": 3,
+      "format": "format26",
+      "powerpointTitle": "収入を増やすには",
+      "powerpointItems": [
+        "本業のスキルアップ",
+        "**副業**でプラス収入",
+        "投資で資産を働かせる"
+      ],
+      "seconds": 8
+    },
+    {
+      "slideNumber": 4,
+      "format": "format26",
+      "powerpointTitle": "支出を減らすコツ",
+      "powerpointItems": [
+        "**固定費**から見直す",
+        "サブスクを整理する",
+        "家計簿アプリを活用"
+      ],
+      "seconds": 8
+    },
+    {
+      "slideNumber": 5,
+      "format": "format04",
+      "title": "まとめ",
+      "items": [
+        "収入アップを目指す",
+        "固定費を見直す",
+        "コツコツ資産運用"
+      ],
+      "seconds": 7
+    }
+  ]
+}

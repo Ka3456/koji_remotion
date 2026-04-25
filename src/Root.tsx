@@ -1,47 +1,74 @@
-import "./index.css";
-import { Composition } from "remotion";
-import { HelloWorld, myCompSchema } from "./HelloWorld";
-import { Logo, myCompSchema2 } from "./HelloWorld/Logo";
+import { Audio, Composition, Series, staticFile } from "remotion";
+import { VIDEOS, TEMPLATE_MAP, VIDEO_NAMES } from "./scriptContent";
 
-// Each <Composition> is an entry in the sidebar!
+const FPS = 30;
+const TRANSITION_SECONDS = 3;
+
+const VideoComposition: React.FC<{
+  scriptData: { slides: any[] };
+}> = ({ scriptData }) => {
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        backgroundColor: "#FFFFFF",
+      }}
+    >
+      <Series>
+        {scriptData.slides.map((slide: any) => {
+          const Template = TEMPLATE_MAP[slide.format];
+          if (!Template) return null;
+
+          const durationInFrames =
+            ((slide.seconds || 8) + TRANSITION_SECONDS) * FPS;
+
+          const { slideNumber, format, seconds, audioFile, ...templateProps } =
+            slide;
+
+          return (
+            <Series.Sequence
+              key={slideNumber}
+              durationInFrames={durationInFrames}
+            >
+              {audioFile && <Audio src={staticFile(audioFile)} />}
+              <Template {...templateProps} />
+            </Series.Sequence>
+          );
+        })}
+      </Series>
+    </div>
+  );
+};
+
+function getTotalFrames(scriptData: { slides: any[] }) {
+  return scriptData.slides.reduce(
+    (sum: number, s: any) =>
+      sum + ((s.seconds || 8) + TRANSITION_SECONDS) * FPS,
+    0,
+  );
+}
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
-      <Composition
-        // You can take the "id" to render a video:
-        // npx remotion render HelloWorld
-        id="HelloWorld"
-        component={HelloWorld}
-        durationInFrames={150}
-        fps={30}
-        width={1920}
-        height={1080}
-        // You can override these props for each render:
-        // https://www.remotion.dev/docs/parametrized-rendering
-        schema={myCompSchema}
-        defaultProps={{
-          titleText: "Welcome to Remotion",
-          titleColor: "#000000",
-          logoColor1: "#91EAE4",
-          logoColor2: "#86A8E7",
-        }}
-      />
-
-      {/* Mount any React component to make it show up in the sidebar and work on it individually! */}
-      <Composition
-        id="OnlyLogo"
-        component={Logo}
-        durationInFrames={150}
-        fps={30}
-        width={1920}
-        height={1080}
-        schema={myCompSchema2}
-        defaultProps={{
-          logoColor1: "#91dAE2" as const,
-          logoColor2: "#86A8E7" as const,
-        }}
-      />
+      {VIDEO_NAMES.map((name) => {
+        const scriptData = VIDEOS[name];
+        if (!scriptData) return null;
+        return (
+          <Composition
+            key={name}
+            id={name.replace(/[^a-zA-Z0-9\u4E00-\u9FFF-]/g, "")}
+            component={VideoComposition}
+            defaultProps={{ scriptData }}
+            durationInFrames={getTotalFrames(scriptData)}
+            fps={FPS}
+            width={1920}
+            height={1080}
+          />
+        );
+      })}
     </>
   );
 };

@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  voicevox:
+    image: "voicevox/voicevox_engine:cpu-latest"
+    container_name: voicevox
+    ports:
+      - "50021:50021"
+    stdin_open: true 
+    tty: true
+    restart: always
