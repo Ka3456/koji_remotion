@@ -1,0 +1,87 @@
+{
+  "slides": [
+    {
+      "slideNumber": 1,
+      "format": "format01",
+      "title": "その1R投資は危険\n契約した瞬間に詰む",
+      "subtitle": "知らぬ間に赤字化",
+      "seconds": 19,
+      "narration": "もし「手堅いワンルームですよ」と勧められたら、ちょっと待って。契約直後から赤字に傾く仕組みを、短時間でわかりやすく解きほぐします。なぜ危ないのか、価格・税金・出口の三つの視点で、落ち着いて確認していきます。",
+      "audioFile": "script/0-1/narration/long_scene_1.wav"
+    },
+    {
+      "slideNumber": 2,
+      "format": "format04",
+      "title": "今日話す3つのこと",
+      "items": [
+        "1R投資が詰む理由",
+        "節税トークの罠",
+        "誘いが来たら？"
+      ],
+      "seconds": 17,
+      "narration": "まず、ワンルーム投資が契約直後から苦しくなる仕組みを、実例ベースで押さえます。次に「節税」トークの注意点。最後に、勧誘が来たときの落ち着いた対処を確認し、ポイントを順に見ていきましょう。",
+      "audioFile": "script/0-1/narration/long_scene_2.wav"
+    },
+    {
+      "slideNumber": 3,
+      "format": "format10",
+      "question": "「1R投資しませんか？」\nこの誘い、来たことありますか？",
+      "label": "問いかけ",
+      "seconds": 18,
+      "narration": "さて、質問です。電話や街頭アンケート、セミナー後などで「ワンルーム投資どうですか」と声をかけられた経験、ありますか？ちょっと思い出してみてください。SNSのDMや、職場への連絡という形もあります。",
+      "characterImage": "assets/images/thinking-businessman.png",
+      "audioFile": "script/0-1/narration/long_scene_3.wav"
+    },
+    {
+      "slideNumber": 4,
+      "format": "format26",
+      "powerpointTitle": "なぜ1R契約が即詰みに？",
+      "powerpointItems": [
+        "割高価格と低家賃の固定化",
+        "初期諸費用で手元資金が減",
+        "**売却・解約が難しい**"
+      ],
+      "seconds": 23,
+      "narration": "新築や築浅は販売価格が家賃水準に対して高くなりがちで、家賃はすぐには上がりません。さらに手数料や登記費用で現金が減少。加えて解約や売却にコストがかかり、身動きが取りづらくなります。結果として返済と維持費の比重が増し、月次の収支が圧迫されやすいのです。",
+      "characterImage": "assets/images/realestate-icons.png",
+      "audioFile": "script/0-1/narration/long_scene_4.wav"
+    },
+    {
+      "slideNumber": 5,
+      "format": "format26",
+      "powerpointTitle": "「節税になります」の正体",
+      "powerpointItems": [
+        "**減税効果は一時的**",
+        "所得や控除で結果が大きく変動",
+        "赤字前提の提案に要注意"
+      ],
+      "seconds": 21,
+      "narration": "減価償却や金利で一時的に課税所得が下がることはありますが、所得水準や扶養・医療費控除の状況で効果は大きく変わります。長期で赤字前提の想定なら、現金流出が続く点を冷静に点検しましょう。将来の売却益で相殺できるかも、条件次第です。",
+      "characterImage": "assets/images/investment-tools-icons.png",
+      "audioFile": "script/0-1/narration/long_scene_5.wav"
+    },
+    {
+      "slideNumber": 6,
+      "format": "format11",
+      "situation": "「節税になります」で即契約。\n家賃不足と返済負担が重なり資金難に。",
+      "label": "危険な状況",
+      "seconds": 22,
+      "narration": "これは本当に危険なパターンです。「節税になります」で即契約すると、思ったより家賃が伸びず、返済・管理費・修繕積立が重なります。生活費に食い込み、カードや借入で補う前に、必ず収支の見直しを。専門家への早めの相談も有効です。",
+      "characterImage": "assets/images/stressed-man-worker.png",
+      "audioFile": "script/0-1/narration/long_scene_6.wav"
+    },
+    {
+      "slideNumber": 7,
+      "format": "format04",
+      "title": "今日のまとめ",
+      "items": [
+        "即決しない・契約前相談",
+        "収支と出口を必ず試算",
+        "勧誘は記録を残す"
+      ],
+      "seconds": 18,
+      "narration": "焦ってサインしないこと。迷ったら契約前に第三者へ相談。購入前は家賃・金利・売却の想定まで収支を試算し、勧誘の連絡や資料は日時ごとに記録しておきましょう。感情で決めない仕組みづくりが大切です。",
+      "audioFile": "script/0-1/narration/long_scene_7.wav"
+    }
+  ]
+}

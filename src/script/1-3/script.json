@@ -1,0 +1,87 @@
+{
+  "slides": [
+    {
+      "slideNumber": 1,
+      "format": "format01",
+      "title": "その1R投資\n契約した瞬間に詰む",
+      "subtitle": "知らないと危ない",
+      "seconds": 16,
+      "narration": "ワンルーム投資、実は契約した直後から不利になることがあります。今日は、なぜそうなるのかと、回避の考え方を短く解説します。営業で聞く節税トークの注意点と、断り方のコツもお伝えします。",
+      "audioFile": "script/1-3/narration/long_scene_1.wav"
+    },
+    {
+      "slideNumber": 2,
+      "format": "format04",
+      "title": "今日話す3つのこと",
+      "items": [
+        "なぜ詰む？",
+        "節税トークの罠",
+        "断るコツ"
+      ],
+      "seconds": 17,
+      "narration": "まず、どこでお金が先に減るのかを整理し、次に節税という言葉の落とし穴を確認。最後に、勧誘を無理なく断る具体的な言い回しを共有します。流れを追えば、危険なサインが見えてきます。一緒に確認しましょう。",
+      "audioFile": "script/1-3/narration/long_scene_2.wav"
+    },
+    {
+      "slideNumber": 3,
+      "format": "format10",
+      "question": "『1R投資しませんか？』\nこの誘い、来たことある？",
+      "label": "問いかけ",
+      "seconds": 17,
+      "narration": "さて、質問です。電話やSNSで「ワンルーム投資どうですか？」と勧誘を受けたこと、ありませんか。ちょっと考えてみてください。もし心当たりがあるなら、この先のポイントが役立ちます。ぜひ聞いてください。",
+      "characterImage": "assets/images/thinking-businessman.png",
+      "audioFile": "script/1-3/narration/long_scene_3.wav"
+    },
+    {
+      "slideNumber": 4,
+      "format": "format26",
+      "powerpointTitle": "契約直後に詰むカラクリ",
+      "powerpointItems": [
+        "初期費用と手数料で赤字出発",
+        "家賃収入より返済が重くなる",
+        "売却コスト高で**出口**が狭い"
+      ],
+      "seconds": 21,
+      "narration": "最初に諸費用や手数料で一気に現金が減り、スタートが赤字になりやすい。さらに返済額が家賃を上回る月が続くと、持ち出しが常態化。最後は売却時の諸費用が重く、出口が狭くなります。想定外の空室や修繕が重なると、さらに資金繰りが悪化しがちです。",
+      "characterImage": "assets/images/realestate-icons.png",
+      "audioFile": "script/1-3/narration/long_scene_4.wav"
+    },
+    {
+      "slideNumber": 5,
+      "format": "format26",
+      "powerpointTitle": "『節税になります』の落とし穴",
+      "powerpointItems": [
+        "税額よりトータル収支が大事",
+        "減価償却だけでは現金増えず",
+        "将来の修繕費も見落としがち"
+      ],
+      "seconds": 21,
+      "narration": "節税と聞くと得に見えますが、肝心なのは税額より手元資金のトータル収支です。減価償却は帳簿上の費用で、現金は増えません。さらに将来の修繕や設備更新も、計画に織り込む必要があります。数字を年単位で並べ、実質の出入りを確認しましょう。",
+      "characterImage": "assets/images/investment-tools-icons.png",
+      "audioFile": "script/1-3/narration/long_scene_5.wav"
+    },
+    {
+      "slideNumber": 6,
+      "format": "format11",
+      "situation": "『節税になる』と契約。\n毎月の持ち出しが発生し、売却も難航",
+      "label": "危険な状況",
+      "seconds": 21,
+      "narration": "これは本当に危険なパターンです。節税だと信じて契約すると、毎月の持ち出しが続き、心が折れた頃に売却も難航します。資金が細る連鎖が起きる前に、条件と数字を必ず点検してください。一度赤字化すると巻き戻すのは難しく、時間も手数料も奪われます。",
+      "characterImage": "assets/images/stressed-man-worker.png",
+      "audioFile": "script/1-3/narration/long_scene_6.wav"
+    },
+    {
+      "slideNumber": 7,
+      "format": "format04",
+      "title": "今日の結論",
+      "items": [
+        "節税を理由にしない",
+        "収支を自分で試算",
+        "即決セールスは断る"
+      ],
+      "seconds": 17,
+      "narration": "結論、節税という言葉だけで判断しないこと。まず自分で収支を試算し、数字に根拠を持つ。さらに即決を迫る営業には、期日を置いて丁寧に断りましょう。自分のペースで検討するだけで、守れるお金があります。",
+      "audioFile": "script/1-3/narration/long_scene_7.wav"
+    }
+  ]
+}

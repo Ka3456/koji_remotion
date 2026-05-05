@@ -52,10 +52,10 @@ function main() {
   const data = JSON.parse(raw);
 
   const destScriptDir = path.join(MODEL002_DIR, "src", "script", NAME);
-  const destAssetsDir = path.join(destScriptDir, "assets", "narration");
+  const destNarrationDir = path.join(destScriptDir, "narration");
 
   fs.mkdirSync(destScriptDir, { recursive: true });
-  fs.mkdirSync(destAssetsDir, { recursive: true });
+  fs.mkdirSync(destNarrationDir, { recursive: true });
 
   // ── 音声ファイルをコピー ──────────────────────────────────────────────────
   let copiedAudio = 0;
@@ -64,11 +64,11 @@ function main() {
     for (const wav of wavFiles) {
       fs.copyFileSync(
         path.join(narrationDir, wav),
-        path.join(destAssetsDir, wav)
+        path.join(destNarrationDir, wav)
       );
       copiedAudio++;
     }
-    console.log(`  音声ファイルをコピーしました: ${copiedAudio} 件 → assets/narration/`);
+    console.log(`  音声ファイルをコピーしました: ${copiedAudio} 件 → narration/`);
   } else {
     console.log("  [情報] narration ディレクトリが存在しません。音声なしで続行します。");
   }
@@ -83,12 +83,17 @@ function main() {
     // audioFile パスを model002 の staticFile() で参照できる形式に更新
     if (converted.audioFile) {
       const filename = path.basename(converted.audioFile);
-      converted.audioFile = `script/${NAME}/assets/narration/${filename}`;
+      converted.audioFile = `script/${NAME}/narration/${filename}`;
     }
 
     // 不要フィールドの除去
     for (const field of STRIP_FIELDS) {
       delete converted[field];
+    }
+
+    // narration フィールドが無ければ空文字で追加
+    if (!("narration" in converted)) {
+      converted.narration = "";
     }
 
     return converted;

@@ -1,0 +1,39 @@
+{
+  "slides": [
+    {
+      "slideNumber": 1,
+      "format": "format01",
+      "title": "その1R投資\n契約した瞬間に詰みます",
+      "subtitle": "知らないと損する",
+      "seconds": 9,
+      "narration": "1R投資に興味がありますか？契約した瞬間に後悔することも。今日はその理由を詳しく解説します。",
+      "audioFile": "script/0-0/narration/long_scene_1.wav"
+    },
+    {
+      "slideNumber": 2,
+      "format": "format04",
+      "title": "今日話す3つのこと",
+      "items": [
+        "1R投資の危険性",
+        "節税の罠",
+        "よくある誘い"
+      ],
+      "seconds": 9,
+      "narration": "今日は、1R投資がなぜ危険なのか、節税の落とし穴、そしてよくある勧誘方法についてお話しします。",
+      "audioFile": "script/0-0/narration/long_scene_2.wav"
+    },
+    {
+      "slideNumber": 3,
+      "format": "format26",
+      "powerpointTitle": "1R投資のリスクとは",
+      "powerpointItems": [
+        "契約後の**詰み**",
+        "節税の名目に注意",
+        "誘い文句に気をつけて"
+      ],
+      "seconds": 11,
+      "narration": "1R投資のリスクについてですが、契約後に後悔するケースが多いです。節税という名目も要注意で、甘い誘い文句に惑わされないようにしましょう。",
+      "audioFile": "script/0-0/narration/long_scene_3.wav"
+    }
+  ]
+}

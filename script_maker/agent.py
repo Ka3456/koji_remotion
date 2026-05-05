@@ -10,7 +10,6 @@ import argparse
 from typing import List, Dict, Optional, Tuple
 
 from dotenv import load_dotenv
-from openai import OpenAI
 
 
 def log(msg: str) -> None:
@@ -18,9 +17,10 @@ def log(msg: str) -> None:
 
 
 # =========================
-# OpenAI client
+# OpenAI client (遅延 import: --full --no-research では openai を読み込まない)
 # =========================
-def get_client() -> OpenAI:
+def get_client():
+    from openai import OpenAI  # 遅延 import
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise ValueError("OPENAI_API_KEY が .env に設定されていません")
@@ -30,7 +30,38 @@ def get_client() -> OpenAI:
 # =========================
 # Pretext loader
 # =========================
-PRETEXT_ENCODINGS = ("cp932", "utf-8", "utf-8-sig")
+PRETEXT_ENCODINGS = ("utf-8-sig", "utf-8", "cp932")
+
+
+# =========================
+# Image catalog (public/assets/images/ 配下)
+# =========================
+IMAGE_CATALOG: List[Tuple[str, str]] = [
+    ("designing-floorplan.png", "間取り図を設計している様子"),
+    ("floor-plan.png", "間取り図そのもの"),
+    ("imagining-empty-office.png", "空室のオフィスを想像している"),
+    ("imagining-property.png", "物件を想像している"),
+    ("investment-tools-icons.png", "投資ツール／指標のアイコン群"),
+    ("person-avatars.png", "複数の人物アバター"),
+    ("phone-consultation-woman.png", "女性が電話で相談している"),
+    ("property-consultation.png", "不動産の対面相談"),
+    ("property-search-icons.png", "物件検索系アイコン"),
+    ("realestate-icons.png", "不動産関連アイコン"),
+    ("saving-money-coin.png", "貯金・コイン"),
+    ("scammer-hacker-laptop.png", "詐欺師／ハッカーがPC操作"),
+    ("stressed-man-worker.png", "ストレスを抱える男性会社員"),
+    ("stressed-woman-worker.png", "ストレスを抱える女性会社員"),
+    ("suspicious-man-laptop.png", "怪しげな男性とノートPC"),
+    ("suspicious-man-phone.png", "怪しげな男性と電話"),
+    ("thinking-businessman.png", "考え込むビジネスマン"),
+    ("vacant-room-isometric.png", "空室のアイソメトリックイラスト"),
+    ("worried-man-profile.png", "不安そうな男性のプロフィール"),
+    ("worried-woman-profile.png", "不安そうな女性のプロフィール"),
+    ("youtube_icon.png", "汎用フォールバック（最終手段）"),
+]
+ALLOWED_IMAGE_FILES = {name for name, _ in IMAGE_CATALOG}
+DEFAULT_IMAGE_FILE = "youtube_icon.png"
+IMAGE_PATH_PREFIX = "assets/images/"
 
 
 def read_pretext(path: str) -> str:
@@ -145,7 +176,7 @@ Web検索ツール (web_search) を使って具体的な数字・ニュース・
 """
 
 
-def gather_research_via_openai(parsed: Dict, model: str = "gpt-4o") -> List[Dict]:
+def gather_research_via_openai(parsed: Dict, model: str = "gpt-5") -> List[Dict]:
     """
     OpenAI Responses API + web_search_preview ツールで台本素材をリサーチし、
     findings リストを返す。失敗時は空リスト。
@@ -242,23 +273,35 @@ def format_research_block(findings: List[Dict]) -> str:
 DESIGN_SYSTEM_PROMPT = """あなたは短尺YouTube解説動画の構成作家です。
 与えられた台本素材（短いスライド断片の連なり）を読み解き、視聴維持率の高いスライド構成を設計します。
 
-【利用可能フォーマット（この3種だけを使う。他は禁止）】
+【利用可能フォーマット（この5種だけを使う。他は禁止）】
 - format01: オープニングタイトル。動画冒頭1枚のみ。{title, subtitle}
     - title: 動画の主題（インパクトのある2行、合計15〜26文字、改行は \\n で表現）
     - subtitle: 視聴者の興味を引く短いキャッチ（8〜14文字、例「知らないと損する」）
 - format04: 3カードの箇条書き。目次・要点まとめ・3つの選択肢など。{title, items[3]}
     - title: 16文字以内（例「今日のテーマ」「3つの罠」「結論」）
     - items: 必ず3項目。各12文字以内推奨、最大16文字。短く名詞句で。
+- format10: 視聴者への問いかけ。チャイムが鳴り、視聴者を立ち止まらせる1枚。{question, label}
+    - question: 視聴者に投げかける質問文（20〜40文字、改行は \\n 可）
+    - label: ラベル文字（省略可。デフォルト「問いかけ」）
+    - 使いどころ: 解説の前に視聴者を巻き込みたい場面、「あなたはこれ知ってますか？」系の問い。
+      動画全体で1〜2枚まで。format01 直後や中盤の転換点に効果的。
+- format11: 危険・警告シーン。専用BGMが流れ、緊張感を演出する1枚。{situation, label}
+    - situation: 危険な状況の説明（20〜50文字、改行は \\n 可）
+    - label: ラベル文字（省略可。デフォルト「危険な状況」）
+    - 使いどころ: 「期限の利益を失って一括返済」「売れない・出口なし」「毎月赤字が続く」など
+      視聴者にリスクを強く印象づけたい場面。動画全体で1〜2枚まで。
 - format26: 黒板＋キャラの詳細解説スライド。中盤の説明用。{powerpointTitle, powerpointItems[1-3]}
     - powerpointTitle: 22文字以内、視聴者の手を止めるキャッチコピー
     - powerpointItems: 1〜3項目、各12〜18文字。最重要キーワード1箇所だけ **〜** で強調可
       （**強調** は format26 のみ。各スライドで最大1箇所まで。）
 
 【構成方針】
-- 全体で 5〜9 枚に集約する（短いスライド断片を意味のあるまとまりに束ねる）。
+- 全体で 5〜10 枚に集約する（短いスライド断片を意味のあるまとまりに束ねる）。
 - 1枚目は必ず format01。動画全体の「結論／フック」を提示する。
 - 2枚目あたりに format04 で「今日話す3つのこと」のような目次を置くと視聴維持に効果的。
 - 中盤は format26 を中心に展開。format04 と組み合わせてリズムを作る。
+- 素材にリスク・危険・損失の描写がある場合は format11 を1〜2枚挿入してインパクトを出す。
+- 素材に視聴者への問いかけ・クイズ的な問いがある場合は format10 を活用する。
 - 最後は format04 か format26 で「まとめ」「結論」を提示する。
 - 起承転結のラベルは内部ペース配分の参考にすぎない。
   **「起」「承」「転」「結」という単語や、それを示す区切りスライドは絶対に作らない。**
@@ -284,6 +327,8 @@ DESIGN_SYSTEM_PROMPT = """あなたは短尺YouTube解説動画の構成作家�
   "slides": [
     {"format": "format01", "source_indices": [], "title": "〜\\n〜", "subtitle": "〜"},
     {"format": "format04", "source_indices": [1,2,3], "title": "〜", "items": ["...", "...", "..."]},
+    {"format": "format10", "source_indices": [4], "question": "〜\\n〜？", "label": "問いかけ"},
+    {"format": "format11", "source_indices": [8,9], "situation": "〜\\n〜", "label": "危険な状況"},
     {"format": "format26", "source_indices": [6,7,8], "powerpointTitle": "〜", "powerpointItems": ["...", "**強調**...", "..."]}
   ]
 }
@@ -316,7 +361,7 @@ def build_design_user_prompt(parsed: Dict, findings: Optional[List[Dict]] = None
     return "\n".join(lines)
 
 
-def design_slide_flow(parsed: Dict, findings: Optional[List[Dict]] = None, model: str = "gpt-4o") -> Dict:
+def design_slide_flow(parsed: Dict, findings: Optional[List[Dict]] = None, model: str = "gpt-5") -> Dict:
     client = get_client()
     user = build_design_user_prompt(parsed, findings=findings)
     log(f"design_slide_flow: model={model}")
@@ -327,7 +372,6 @@ def design_slide_flow(parsed: Dict, findings: Optional[List[Dict]] = None, model
             {"role": "user", "content": user},
         ],
         response_format={"type": "json_object"},
-        temperature=0.5,
     )
     content = resp.choices[0].message.content
     return json.loads(content)
@@ -336,8 +380,8 @@ def design_slide_flow(parsed: Dict, findings: Optional[List[Dict]] = None, model
 # =========================
 # Validator / normalizer
 # =========================
-ALLOWED_FORMATS = {"format01", "format04", "format26"}
-SECONDS_BY_FORMAT = {"format01": 7, "format04": 7, "format26": 8}
+ALLOWED_FORMATS = {"format01", "format04", "format10", "format11", "format26"}
+SECONDS_BY_FORMAT = {"format01": 7, "format04": 7, "format10": 7, "format11": 8, "format26": 8}
 FORBIDDEN_PHRASES = ("起／承／転／結", "起承転結")
 
 
@@ -370,6 +414,30 @@ def normalize_slide(slide: Dict, index: int) -> Dict:
             items.append(items[-1])
         out["title"] = title or "ポイント"
         out["items"] = items
+
+    elif fmt == "format10":
+        question = (slide.get("question") or "").strip()
+        if not question:
+            raise ValueError("format10 に question がありません")
+        out["question"] = question
+        label = (slide.get("label") or "").strip()
+        if label:
+            out["label"] = label
+        char = (slide.get("characterImage") or "").strip()
+        if char:
+            out["characterImage"] = char
+
+    elif fmt == "format11":
+        situation = (slide.get("situation") or "").strip()
+        if not situation:
+            raise ValueError("format11 に situation がありません")
+        out["situation"] = situation
+        label = (slide.get("label") or "").strip()
+        if label:
+            out["label"] = label
+        char = (slide.get("characterImage") or "").strip()
+        if char:
+            out["characterImage"] = char
 
     elif fmt == "format26":
         title = (slide.get("powerpointTitle") or slide.get("title") or "").strip()
@@ -414,7 +482,7 @@ def validate_designed(designed: Dict) -> List[Dict]:
 
 def _all_text_fields(slide: Dict) -> List[str]:
     out: List[str] = []
-    for k in ("title", "subtitle", "powerpointTitle"):
+    for k in ("title", "subtitle", "powerpointTitle", "question", "situation"):
         v = slide.get(k)
         if isinstance(v, str):
             out.append(v)
@@ -423,6 +491,221 @@ def _all_text_fields(slide: Dict) -> List[str]:
         if isinstance(v, list):
             out.extend([str(x) for x in v])
     return out
+
+
+# =========================
+# Narration generation via OpenAI
+# =========================
+NARRATION_SYSTEM_PROMPT = """あなたは短尺YouTube動画のナレーター兼台本ライターです。
+与えられたスライド構成と元の素材をもとに、各スライドに対応する「読み上げナレーション」を生成してください。
+
+【ルール】
+- 視聴者に語りかける自然な話し言葉（です・ます調）
+- 各スライドの seconds に合わせた長さ（7秒=90〜110文字、8秒=100〜125文字が目安）
+- スライドのタイトルや項目をそのまま読み上げず、内容を自分の言葉で補足・解説する
+- 煽り・断定的投資助言・誇張は禁止
+- 自然な「間」が取れるよう、読点（、）を適切に入れる
+- format01（オープニング）: 視聴者の興味を引くフックで始め、この動画で学べることを一言で示す
+- format04（箇条書き）: 3項目を自然につなぎ、流れよく紹介する
+- format10（問いかけ）: チャイムが鳴る演出があるので「さて、質問です」「ちょっと考えてみてください」など
+  視聴者を一瞬立ち止まらせる導入フレーズから始める。質問文を自然に語りかける形で読む。
+- format11（危険な状況）: 緊張感のあるBGMが流れる演出に合わせ、落ち着いた警告口調で。
+  「これは本当に危険なパターンです」「ここが一番重要なリスクです」など、
+  視聴者に深刻さを伝えるが、煽りすぎず事実ベースで語る。
+- format26（解説）: 黒板の内容を掘り下げ、具体例や理由を加えて説明する
+
+【出力】
+以下のJSON形式のみ出力。説明文不要。
+{
+  "narrations": [
+    {"slideNumber": 1, "narration": "〜〜〜"},
+    {"slideNumber": 2, "narration": "〜〜〜"}
+  ]
+}
+"""
+
+
+def generate_narrations(slides: List[Dict], parsed: Dict, model: str = "gpt-5") -> None:
+    """各スライドに narration フィールドを付与する（in-place）。"""
+    client = get_client()
+
+    slides_desc_lines: List[str] = []
+    for s in slides:
+        fmt = s["format"]
+        sn = s["slideNumber"]
+        sec = s.get("seconds", 7)
+        if fmt == "format01":
+            slides_desc_lines.append(
+                f"slideNumber={sn}, format={fmt}, seconds={sec}, "
+                f"title={s.get('title','')!r}, subtitle={s.get('subtitle','')!r}"
+            )
+        elif fmt == "format04":
+            slides_desc_lines.append(
+                f"slideNumber={sn}, format={fmt}, seconds={sec}, "
+                f"title={s.get('title','')!r}, items={s.get('items',[])}"
+            )
+        elif fmt == "format10":
+            slides_desc_lines.append(
+                f"slideNumber={sn}, format={fmt}, seconds={sec}, "
+                f"question={s.get('question','')!r}, label={s.get('label','問いかけ')!r}"
+            )
+        elif fmt == "format11":
+            slides_desc_lines.append(
+                f"slideNumber={sn}, format={fmt}, seconds={sec}, "
+                f"situation={s.get('situation','')!r}, label={s.get('label','危険な状況')!r}"
+            )
+        elif fmt == "format26":
+            slides_desc_lines.append(
+                f"slideNumber={sn}, format={fmt}, seconds={sec}, "
+                f"powerpointTitle={s.get('powerpointTitle','')!r}, powerpointItems={s.get('powerpointItems',[])}"
+            )
+
+    bodies = "\n".join(
+        f"### {src['number']} {src['body'].replace(chr(10), ' / ')}"
+        for src in parsed.get("slides", [])
+    )
+    user_input = (
+        f"【エピソード】{parsed['episode_title']}\n"
+        f"【メインフック】{parsed['hook']}\n\n"
+        f"【スライド構成】\n" + "\n".join(slides_desc_lines) + "\n\n"
+        f"【元の素材】\n{bodies}\n\n"
+        "上記スライド構成に対応するナレーション（読み上げ原稿）を JSON で出力してください。"
+    )
+
+    log(f"generate_narrations: model={model}, slides={len(slides)}枚")
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": NARRATION_SYSTEM_PROMPT},
+            {"role": "user", "content": user_input},
+        ],
+        response_format={"type": "json_object"},
+    )
+    content = resp.choices[0].message.content
+    data = json.loads(content)
+    narrations: Dict[int, str] = {
+        item["slideNumber"]: item["narration"]
+        for item in data.get("narrations", [])
+        if isinstance(item, dict) and "slideNumber" in item and "narration" in item
+    }
+
+    for slide in slides:
+        sn = slide["slideNumber"]
+        narration = narrations.get(sn, "")
+        if narration:
+            slide["narration"] = narration
+            log(f"  スライド {sn}: ナレーション {len(narration)}文字")
+        else:
+            log(f"  スライド {sn}: ナレーション生成失敗")
+
+
+# =========================
+# Image assignment via OpenAI (format26 only)
+# =========================
+IMAGE_SYSTEM_PROMPT = """あなたは短尺YouTube解説動画のビジュアル編集者です。
+各スライドの内容に最も合う画像を、与えられた画像カタログから1枚だけ選びます。
+
+【絶対ルール】
+- カタログにあるファイル名のみ使用可。カタログ外のファイル名は禁止
+- 各対象スライド（format10/11/26）につき、カタログから1ファイル名を選ぶ
+- どうしても適切な画像が無い場合のみ youtube_icon.png を選ぶ（最終手段）
+- 同じ画像が連続しないよう、可能であればバリエーションを意識する
+
+【フォーマット別の傾向（参考）】
+- format10（問いかけ）: thinking-businessman.png や worried-man-profile.png など「考える・悩む」系が合いやすい
+- format11（危険な状況）: stressed-man-worker.png / stressed-woman-worker.png など「追い詰められた・困惑」系が合いやすい
+- ただし内容が優先なので、上記に縛られず最も合う画像を選ぶこと
+
+【出力】
+以下の JSON のみを出力。説明文は不要。
+{
+  "assignments": [
+    {"slideNumber": 4, "image": "stressed-man-worker.png"},
+    {"slideNumber": 6, "image": "floor-plan.png"}
+  ]
+}
+"""
+
+
+IMAGE_FORMATS = {"format10", "format11", "format26"}
+
+def assign_images_to_slides(
+    slides: List[Dict],
+    parsed: Dict,
+    model: str = "gpt-5",
+) -> None:
+    """各 format10/11/26 スライドに characterImage フィールドを付与する（in-place）。"""
+    target_slides = [s for s in slides if s.get("format") in IMAGE_FORMATS]
+    if not target_slides:
+        log("画像選定: 対象スライドが無いためスキップ")
+        return
+
+    log(f"assign_images_to_slides: model={model}, 対象スライド={len(target_slides)}枚")
+
+    catalog_lines = [f"- {name}: {desc}" for name, desc in IMAGE_CATALOG]
+    slide_lines: List[str] = []
+    for s in target_slides:
+        sn = s["slideNumber"]
+        fmt = s.get("format", "")
+        narration = s.get("narration", "")
+        if fmt == "format10":
+            slide_lines.append(
+                f"slideNumber={sn}, format={fmt}, question={s.get('question','')!r}, narration={narration!r}"
+            )
+        elif fmt == "format11":
+            slide_lines.append(
+                f"slideNumber={sn}, format={fmt}, situation={s.get('situation','')!r}, narration={narration!r}"
+            )
+        else:
+            title = s.get("powerpointTitle", "")
+            items = s.get("powerpointItems", [])
+            slide_lines.append(
+                f"slideNumber={sn}, format={fmt}, title={title!r}, items={items}, narration={narration!r}"
+            )
+
+    user_input = (
+        f"【エピソード】{parsed.get('episode_title', '')}\n"
+        f"【メインフック】{parsed.get('hook', '')}\n\n"
+        "【画像カタログ（このファイル名以外を出力したら無効）】\n"
+        + "\n".join(catalog_lines)
+        + "\n\n【format26 スライド一覧】\n"
+        + "\n".join(slide_lines)
+        + "\n\n各 slideNumber に最適な画像ファイル名を JSON で出力してください。"
+    )
+
+    try:
+        client = get_client()
+        resp = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": IMAGE_SYSTEM_PROMPT},
+                {"role": "user", "content": user_input},
+            ],
+            response_format={"type": "json_object"},
+        )
+        content = resp.choices[0].message.content
+        data = json.loads(content)
+    except Exception as e:
+        log(f"画像選定失敗（継続）: {e}")
+        return
+
+    assignments: Dict[int, str] = {}
+    for item in data.get("assignments", []):
+        if not isinstance(item, dict):
+            continue
+        sn = item.get("slideNumber")
+        img = (item.get("image") or "").strip()
+        if isinstance(sn, int) and img:
+            assignments[sn] = img
+
+    for slide in target_slides:
+        sn = slide["slideNumber"]
+        chosen = assignments.get(sn, DEFAULT_IMAGE_FILE)
+        if chosen not in ALLOWED_IMAGE_FILES:
+            log(f"  スライド {sn}: 不正な画像名 {chosen!r} → {DEFAULT_IMAGE_FILE} にフォールバック")
+            chosen = DEFAULT_IMAGE_FILE
+        slide["characterImage"] = IMAGE_PATH_PREFIX + chosen
+        log(f"  スライド {sn}: 画像 = {chosen}")
 
 
 # =========================
@@ -449,6 +732,7 @@ def _format_title_two_lines(s: str, max_per_line: int = 13) -> str:
 
 def expand_to_full_slides(parsed: Dict) -> List[Dict]:
     slides_out: List[Dict] = []
+    total_src = len(parsed["slides"])
 
     title_src = parsed.get("hook") or parsed.get("episode_title") or "本編"
     subtitle_src = parsed.get("episode_title") or "知らないと損する"
@@ -458,11 +742,13 @@ def expand_to_full_slides(parsed: Dict) -> List[Dict]:
         "subtitle": _truncate(subtitle_src, 14),
     }
     slides_out.append(normalize_slide(slide01, 0))
+    log(f"  スライド 1 / {total_src + 1}: [format01] タイトル「{slide01['title'].replace(chr(10), ' / ')}」")
 
     for idx, src in enumerate(parsed["slides"], start=1):
         body = src.get("body", "").strip()
         lines = [l.strip() for l in body.split("\n") if l.strip()]
         if not lines:
+            log(f"  スライド {idx + 1} / {total_src + 1}: 本文が空のためスキップ")
             continue
         title = _truncate(lines[0], 22)
         if len(lines) == 1:
@@ -475,6 +761,7 @@ def expand_to_full_slides(parsed: Dict) -> List[Dict]:
             "powerpointItems": items,
         }
         slides_out.append(normalize_slide(slide26, len(slides_out)))
+        log(f"  スライド {len(slides_out)} / {total_src + 1}: [format26] 「{title}」 items={len(items)}")
 
     return slides_out
 
@@ -503,12 +790,23 @@ def run(pretext_path: str, out_path: str, model: str, do_research: bool = True, 
         designed = design_slide_flow(parsed, findings=findings, model=model)
         slides_json = validate_designed(designed)
 
+    generate_narrations(slides_json, parsed, model=model)
+    assign_images_to_slides(slides_json, parsed, model=model)
+
     payload = {"slides": slides_json}
 
     os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
-    log(f"書き出し完了: {out_path} ({len(slides_json)} 枚)")
+
+    total_sec = sum(s.get("seconds", 0) for s in slides_json)
+    fmt_counts: Dict[str, int] = {}
+    for s in slides_json:
+        fmt_counts[s["format"]] = fmt_counts.get(s["format"], 0) + 1
+    fmt_summary = ", ".join(f"{f}×{n}" for f, n in fmt_counts.items())
+    log(f"書き出し完了: {out_path}")
+    log(f"  合計 {len(slides_json)} 枚 / 約 {total_sec} 秒 ({total_sec // 60}分{total_sec % 60}秒)")
+    log(f"  フォーマット内訳: {fmt_summary}")
 
 
 def main():
@@ -521,7 +819,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--pretext", default=default_pretext, help=f"pretext ファイル (default: {default_pretext})")
     p.add_argument("--out", default=default_out, help=f"出力 script.json パス (default: {default_out})")
-    p.add_argument("--model", default="gpt-4o", help="OpenAI モデル名 (default: gpt-4o)")
+    p.add_argument("--model", default="gpt-5", help="OpenAI モデル名 (default: gpt-5)")
     p.add_argument("--no-research", action="store_true", help="Web 検索を無効化（オフラインで動かす）")
     p.add_argument(
         "--full",

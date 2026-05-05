@@ -230,11 +230,12 @@ export const Format26: React.FC<Format26Props> = ({
 
         <div
           style={{
-            width: 400,
+            width: 420,
             flexShrink: 0,
             display: "flex",
             alignItems: "flex-end",
             justifyContent: "center",
+            overflow: "hidden",
             opacity: charEntrance,
             transform: `translateX(${charX}px) translateY(${floatY}px)`,
           }}
@@ -242,10 +243,9 @@ export const Format26: React.FC<Format26Props> = ({
           <Img
             src={staticFile(characterImage)}
             style={{
-              width: 360,
-              height: 360,
-              objectFit: "cover",
-              borderRadius: "50%",
+              width: 400,
+              height: 400,
+              objectFit: "contain",
             }}
           />
         </div>

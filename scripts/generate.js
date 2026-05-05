@@ -63,6 +63,15 @@ function main() {
         `  ${dir}/assets/ → public/script/${dir}/assets/ にコピー完了`,
       );
     }
+
+    const srcNarration = path.join(scriptDir, dir, "narration");
+    const destNarration = path.join(__dirname, `../public/script/${dir}/narration`);
+    if (fs.existsSync(srcNarration)) {
+      fs.cpSync(srcNarration, destNarration, { recursive: true });
+      console.log(
+        `  ${dir}/narration/ → public/script/${dir}/narration/ にコピー完了`,
+      );
+    }
   }
 
   console.log(`\n使用フォーマット: ${[...allFormats].join(", ")}`);
